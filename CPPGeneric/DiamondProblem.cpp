@@ -12,7 +12,7 @@ public:
     virtual ~A(){ } 
     virtual void eat(){ 
         std::cout<<"EAT=>A";
-    }    
+    }
 }; 
 class B: virtual public A   { 
 public:

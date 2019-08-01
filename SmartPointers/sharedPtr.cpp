@@ -1,4 +1,5 @@
 // Referecence - https://www.acodersjourney.com/implementing-smart-pointer-using-reference-counting/
+// https://www.learncpp.com/cpp-tutorial/15-3-move-constructors-and-move-assignment/
 #include <iostream>
 #include <string>
 
@@ -8,27 +9,38 @@ class RefCnt {
 private:
     int refCnt;
 public:
-RefCnt(){refCnt=0;}
-void increment(){
-    refCnt++;
-}
-int decrement(){
-    refCnt--;
-    return refCnt;
-}
-int getCnt(){
-    return refCnt;
-}
+    RefCnt(){
+        refCnt=0;
+    }
+
+    void increment(){
+        refCnt++;
+    }
+
+    int decrement(){
+        refCnt--;
+        return refCnt;
+    }
+
+    int getCnt(){
+        return refCnt;
+    }
 };
 
 template<typename T>
 class SmartPtr {
 private:
-    T* obj{nullptr};
-    RefCnt* cnt{nullptr};
+    T* obj;
+    RefCnt* cnt;
 public:
-    SmartPtr(){}
-    SmartPtr(T* objc):obj{objc},cnt{new RefCnt()}
+    SmartPtr()
+    :obj(nullptr)
+    ,cnt(nullptr) 
+    {}
+
+    SmartPtr(T* objc)
+    :obj{objc}
+    ,cnt{new RefCnt()}
     {
         cnt->increment();
         cout << "Created smart_ptr! Ref count is " << cnt->getCnt() << endl;
@@ -46,27 +58,29 @@ public:
         }
     }
 
-    SmartPtr(SmartPtr<T>& obj2):obj{obj2.obj},
-    cnt{obj2.cnt}{
+    SmartPtr(SmartPtr<T>& obj2)
+    :obj{obj2.obj},
+    cnt{obj2.cnt}
+    {
         cnt->increment();
         cout << "Copied smart_ptr! Ref count is " << cnt->getCnt() << endl;
     }
 
     SmartPtr<T>& operator=(const SmartPtr<T>& other){
-        if(this!=&other){
+        if(this != &other){
             if(cnt && cnt->decrement() == 0){
                 delete obj;
                 delete cnt;
             }
-            obj=other.obj;
-            cnt=other.cnt;
+            obj = other.obj;
+            cnt = other.cnt;
             cnt->increment();
         }
         cout << "Assigned smart_ptr! Ref count is " << cnt->getCnt() << endl;   
         return *this; 
     }
 
-    T& operator*(){
+    T& operator* () {
         return *obj;
     }
     T* operator->(){
